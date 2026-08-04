@@ -5,13 +5,8 @@
   "keywords": ["pi-package", "sustainability", "energy", "water", "footprint"],
   "author": "",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": ""
-  },
   "peerDependencies": {
-    "@mariozechner/pi-coding-agent": "*",
-    "typebox": "*"
+    "@mariozechner/pi-coding-agent": "*"
   },
   "pi": {
     "extensions": ["./src/index.ts"]

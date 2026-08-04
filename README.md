@@ -6,17 +6,18 @@ Show estimated **⚡ energy** and **💧 water** usage of each pi chat in the fo
 
 ```
 ↑12k ↓3.4k R8k $0.042              claude-sonnet-4
-⚡28.5Wh (1.9📱) 💧  0.051L
+⚡28.5Wh (1.9📱) 💧 0.051L
 ```
 
 Energy is shown as **Wh (or kWh) plus an equivalent number of full smartphone charges** (📱, ~15 Wh each — based on a typical 4000–5000 mAh phone battery at 3.7 V). Water is shown in **litres**.
 
 ## What it does
 
-- Adds a status line to pi's footer with cumulative energy (Wh / kWh) and water (L) for the current chat
-- Classifies the current model as `small` / `frontier` / `reasoning` (based on `model.reasoning` and the model id)
-- Recomputes on every assistant message, model switch, and session start
+- Adds a status line to pi's footer with cumulative energy (Wh / kWh) and water (L) for the current chat (sums only the current branch, so forked siblings don't double-count)
+- Classifies the current model as `small` / `frontier` / `reasoning` (based on `model.reasoning` + whether a thinking level is engaged, and the model id)
+- Recomputes on every assistant message, model switch, thinking-level change, and session start
 - Provides a `/eco` command showing a detailed breakdown with tangible comparisons
+- Clears its footer slot cleanly on session shutdown, and only shows the intro notification once per pi run
 
 ## Install
 
@@ -43,10 +44,15 @@ All figures are **rough estimates** derived from public research and hyperscaler
 ### Formulas
 
 ```
-E_it     = In * E_in + Out * E_out * thinking_multiplier
+E_it     = In_fresh    * E_in
+         + CacheWrite  * E_in
+         + CacheRead   * E_in * CACHE_READ_FACTOR   (CACHE_READ_FACTOR = 0.1)
+         + Out         * E_out * thinking_multiplier
 E_total  = E_it * PUE        (PUE = 1.15)
 Water_mL = E_total_Wh * WUE  (WUE = 1.8 mL/Wh = 1.8 L/kWh)
 ```
+
+Cache-read tokens skip most of the prefill compute — providers price them at roughly 10% of fresh input, which we use as an energy proxy. Fresh input and cache-writes are billed (and computed) at the full input rate.
 
 - **PUE** (Power Usage Effectiveness) and **WUE** (Water Usage Effectiveness) are the standard data-center efficiency metrics defined by The Green Grid.
   - PUE — [Wikipedia: Power usage effectiveness](https://en.wikipedia.org/wiki/Power_usage_effectiveness) (summarises The Green Grid's original *PUE: A Comprehensive Examination of the Metric*, 2012)
@@ -79,11 +85,11 @@ The **1.5× thinking multiplier** for reasoning models accounts for hidden chain
 
 ### Classification
 
-- `reasoning`: any model where `model.reasoning === true` (e.g. o1, o3, deepseek-r1)
-- `small`: model id matches `/mini|small|haiku|nano|flash|8b|7b|3b|1b|phi|gemma/i`
+- `reasoning`: `model.reasoning === true` **and** the user has a thinking level engaged (i.e. `/thinking` is not `off`). Merely supporting reasoning is not enough — a model like GPT-5 with thinking turned off is billed as `frontier`.
+- `small`: model id matches `/nano|8b|7b|3b|1b|phi|gemma/i`. We deliberately **no longer** match `mini`, `small`, `haiku`, or `flash`, since those names now cover frontier-tier models (Gemini 2.5 Flash, Claude Haiku 3.5, GPT-5 mini).
 - `frontier`: everything else
 
-Input tokens include `cache-read` and `cache-write` — cache tokens still traverse the model. For the raw methodology sketch this extension is based on, see [`docs/footprint-docs.html`](../footprint-docs.html) in the parent `.pi/` directory.
+Input tokens are split into fresh input, cache-write (full cost) and cache-read (0.1× cost). For the raw methodology sketch this extension is based on, see [`docs/footprint-docs.html`](../footprint-docs.html) in the parent `.pi/` directory.
 
 ## Caveats
 
