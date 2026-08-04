@@ -1,0 +1,19 @@
+{
+  "name": "pi-eco-footprint",
+  "version": "0.1.0",
+  "description": "Show estimated energy (⚡) and water (💧) usage of each chat in pi's footer, based on model class and token counts.",
+  "keywords": ["pi-package", "sustainability", "energy", "water", "footprint"],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "peerDependencies": {
+    "@mariozechner/pi-coding-agent": "*",
+    "typebox": "*"
+  },
+  "pi": {
+    "extensions": ["./src/index.ts"]
+  }
+}

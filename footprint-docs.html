@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>pi — Environmental Footprint Metrics</title>
+<style>
+  :root {
+    --bg: #0f1419;
+    --panel: #1a1f2e;
+    --panel-2: #232938;
+    --border: #2d3448;
+    --fg: #d8dee9;
+    --fg-dim: #8b95a7;
+    --accent: #7dd3fc;
+    --accent-2: #a5f3c8;
+    --water: #60a5fa;
+    --energy: #fbbf24;
+    --code-bg: #0b0f16;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+    padding: 2rem 1rem 5rem;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  h1 {
+    margin: 0 0 0.25rem;
+    font-size: 2rem;
+    background: linear-gradient(90deg, var(--energy), var(--water));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .subtitle { color: var(--fg-dim); margin: 0; }
+  h2 {
+    margin: 2.5rem 0 0.75rem;
+    font-size: 1.35rem;
+    border-left: 3px solid var(--accent);
+    padding-left: 0.75rem;
+  }
+  h3 { margin: 1.5rem 0 0.5rem; font-size: 1.05rem; color: var(--accent-2); }
+  p { margin: 0.5rem 0 1rem; }
+  code {
+    font-family: var(--mono);
+    background: var(--code-bg);
+    padding: 0.1em 0.4em;
+    border-radius: 4px;
+    font-size: 0.9em;
+    border: 1px solid var(--border);
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 0.88rem;
+  }
+  pre code { background: none; border: none; padding: 0; }
+  .formula {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--energy);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin: 1rem 0;
+    font-family: var(--mono);
+    font-size: 0.95rem;
+  }
+  .formula .label { color: var(--fg-dim); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.35rem; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    background: var(--panel);
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 0.92rem;
+  }
+  th, td {
+    padding: 0.7rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    background: var(--panel-2);
+    font-weight: 600;
+    color: var(--accent);
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  tr:last-child td { border-bottom: none; }
+  td code { font-size: 0.85em; }
+  .callout {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--water);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin: 1rem 0;
+  }
+  .callout.warn { border-left-color: var(--energy); }
+  .callout .title { font-weight: 600; margin-bottom: 0.35rem; color: var(--accent-2); }
+  .footer-sample {
+    background: #000;
+    color: #d8dee9;
+    padding: 0.8rem 1rem;
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 0.88rem;
+    white-space: pre;
+    overflow-x: auto;
+    border: 1px solid var(--border);
+  }
+  .dim { color: var(--fg-dim); }
+  .kbd {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.1em 0.4em;
+    font-family: var(--mono);
+    font-size: 0.85em;
+  }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+  }
+  .card h3 { margin-top: 0; }
+  a { color: var(--water); }
+  ul { padding-left: 1.2rem; }
+  li { margin: 0.25rem 0; }
+  .badge {
+    display: inline-block;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.15rem 0.6rem;
+    font-size: 0.75rem;
+    color: var(--fg-dim);
+    margin-right: 0.35rem;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>⚡💧 Environmental Footprint Metrics</h1>
+  <p class="subtitle">How pi estimates the energy and water consumed by each chat session</p>
+  <div style="margin-top: 0.75rem;">
+    <span class="badge">footer.js</span>
+    <span class="badge">interactive mode</span>
+    <span class="badge">v1 — baseline estimates</span>
+  </div>
+</header>
+
+<h2>Where it appears</h2>
+<p>
+  The energy (⚡) and water (💧) estimates are shown in the interactive-mode footer,
+  on the same line as the token counters and dollar cost, in the bottom-left corner.
+</p>
+
+<div class="footer-sample">↑12k ↓3.4k R8k <span style="color:#a5f3c8;">$0.042</span> <span style="color:#fbbf24;">⚡28.5Wh</span> <span style="color:#60a5fa;">💧  0.051L</span>              claude-sonnet-4</div>
+
+<p class="dim" style="font-size: 0.85rem; margin-top: 0.5rem;">
+  Values are cumulative across the whole chat session and update every time the model responds.
+</p>
+
+<h2>The formulas</h2>
+<p>The calculation is a three-step chain — from raw model compute, to full facility energy, to water evaporated for cooling.</p>
+
+<div class="formula">
+  <span class="label">1 · IT-equipment energy (Wh)</span>
+  E_it = (Input_Tokens × E_in) + (Output_Tokens × E_out × thinking_multiplier)
+</div>
+
+<div class="formula">
+  <span class="label">2 · Total facility energy (Wh) — includes cooling, networking, lighting</span>
+  E_total = E_it × PUE
+</div>
+
+<div class="formula">
+  <span class="label">3 · Water consumed (mL) — evaporative cooling</span>
+  Water_mL = E_total_Wh × WUE
+</div>
+
+<div class="callout">
+  <div class="title">Why <code>E_total × WUE</code> comes out in mL</div>
+  WUE is typically expressed as <strong>litres of water per kWh</strong> of energy.
+  Since 1 L/kWh = 1 mL/Wh (both are 10⁻³), multiplying facility-Wh by WUE gives millilitres directly — no extra conversion needed.
+</div>
+
+<h2>Constants</h2>
+
+<h3>Data-center efficiency</h3>
+<table>
+  <thead><tr><th>Constant</th><th>Value</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td><code>PUE</code></td><td>1.15</td><td>Power Usage Effectiveness — hyperscale efficiency baseline (Google/Meta/AWS class)</td></tr>
+    <tr><td><code>WUE</code></td><td>1.8 L/kWh</td><td>Water Usage Effectiveness — regional average for evaporative cooling towers</td></tr>
+  </tbody>
+</table>
+
+<h3>Per-token energy by model class</h3>
+<table>
+  <thead><tr><th>Class</th><th>E_in (Wh/tok)</th><th>E_out (Wh/tok)</th><th>Thinking mult.</th></tr></thead>
+  <tbody>
+    <tr><td>Small</td><td>0.000002</td><td>0.000004</td><td>1×</td></tr>
+    <tr><td>Frontier</td><td>0.002</td><td>0.007</td><td>1×</td></tr>
+    <tr><td>Reasoning</td><td>0.004</td><td>0.025</td><td>1.5×</td></tr>
+  </tbody>
+</table>
+<p class="dim" style="font-size:0.85rem;">
+  The 1.5× multiplier on reasoning-model output tokens accounts for hidden "thinking" tokens
+  that aren't reported by the API but still consume compute.
+</p>
+
+<h2>How pi picks a model class</h2>
+<p>
+  Classification happens per-response in <code>classifyModel(model)</code>. It uses the model's
+  <code>reasoning</code> flag first, then falls back to a case-insensitive regex on the model ID:
+</p>
+
+<pre><code>if (model.reasoning) → "reasoning"
+else if (/mini|small|haiku|nano|flash|8b|7b|3b|1b|phi|gemma/.test(id)) → "small"
+else → "frontier"</code></pre>
+
+<div class="grid-2">
+  <div class="card">
+    <h3>Examples → small</h3>
+    <ul>
+      <li><code>gpt-4o-mini</code></li>
+      <li><code>claude-3-haiku</code></li>
+      <li><code>gemini-flash</code></li>
+      <li><code>llama-3-8b</code></li>
+      <li><code>phi-3</code></li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>Examples → frontier</h3>
+    <ul>
+      <li><code>gpt-4o</code></li>
+      <li><code>claude-sonnet-4</code></li>
+      <li><code>gemini-pro</code></li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>Examples → reasoning</h3>
+    <ul>
+      <li><code>o1</code>, <code>o3</code></li>
+      <li><code>deepseek-r1</code></li>
+      <li>Any model with <code>reasoning: true</code> in the registry</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>Token accounting</h3>
+    <ul>
+      <li><code>Input_Tokens</code> = fresh input <strong>+</strong> cache-read <strong>+</strong> cache-write</li>
+      <li><code>Output_Tokens</code> = generated tokens as reported by the provider</li>
+      <li>Cache tokens are counted because they still move through the model</li>
+    </ul>
+  </div>
+</div>
+
+<h2>Worked example</h2>
+<p>A session with <strong>Claude Sonnet 4</strong> (frontier class) using 12,000 input tokens and 3,400 output tokens:</p>
+
+<pre><code>E_it    = (12000 × 0.002) + (3400 × 0.007 × 1.0)
+        = 24.0 + 23.8
+        = 47.8 Wh
+
+E_total = 47.8 × 1.15
+        = 54.97 Wh   → shown as "⚡55.0Wh"
+
+Water   = 54.97 × 1.8
+        = 98.95 mL   → shown as "💧  0.099L"</code></pre>
+
+<div class="callout">
+  <div class="title">Real-world tangibles</div>
+  55 Wh ≈ running a 10 W LED bulb for <strong>5.5 hours</strong>, or charging an iPhone <strong>~4 times</strong>.<br />
+  99 mL ≈ <strong>~7 tablespoons</strong> of drinking water.
+</div>
+
+<h2>Display formatting</h2>
+<table>
+  <thead><tr><th>Metric</th><th>Range</th><th>Format</th></tr></thead>
+  <tbody>
+    <tr><td rowspan="3">Energy</td><td>&lt; 1 Wh</td><td><code>0.42Wh</code> (2 decimals)</td></tr>
+    <tr><td>1 – 1000 Wh</td><td><code>28.5Wh</code> (1 decimal)</td></tr>
+    <tr><td>≥ 1000 Wh</td><td><code>1.24kWh</code></td></tr>
+    <tr><td rowspan="3">Water (always in litres)</td><td>&lt; 1 L</td><td><code>0.051L</code> (3 decimals)</td></tr>
+    <tr><td>1 – 100 L</td><td><code>12.34L</code> (2 decimals)</td></tr>
+    <tr><td>≥ 100 L</td><td><code>1234.5L</code> (1 decimal)</td></tr>
+  </tbody>
+</table>
+
+<h2>Caveats &amp; assumptions</h2>
+<ul>
+  <li><strong>These are estimates</strong>, not measurements. Actual figures depend on hardware (H100 vs. TPU vs. Trainium), batching efficiency, model quantisation, and data-center location.</li>
+  <li>The per-token constants are order-of-magnitude values drawn from public papers &amp; hyperscaler disclosures. Real providers rarely publish per-token telemetry.</li>
+  <li>PUE 1.15 assumes a modern hyperscale facility. Older or on-prem data centers can be 1.4–2.0, which would raise both energy and water proportionally.</li>
+  <li>WUE 1.8 L/kWh reflects evaporative cooling. Air-cooled or seawater-cooled facilities can be dramatically lower (near 0).</li>
+  <li>Cache-read/write tokens are billed as input tokens here for simplicity, even though cache-reads are cheaper to serve in practice.</li>
+  <li>Only <em>assistant</em> messages contribute — user typing has no direct footprint.</li>
+</ul>
+
+<h2>Source location</h2>
+<p>
+  All logic lives in a single file, appended near the top of the compiled footer component:
+</p>
+<pre><code>dist/modes/interactive/components/footer.js
+  ├─ classifyModel(model)      → "small" | "frontier" | "reasoning"
+  ├─ estimateFootprint(...)    → { energyWh, waterMl }
+  ├─ formatWh(wh)              → "28.5Wh" / "1.24kWh"
+  └─ formatMl(ml)              → always litres, e.g. "0.051L" / "12.34L" / "123.4L"</code></pre>
+
+<p class="dim" style="font-size:0.85rem; margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1rem;">
+  Because the change was applied to the installed <code>dist/</code>, it will be overwritten on
+  the next <code>npm update</code> of <code>@mariozechner/pi-coding-agent</code>. For a durable
+  version, upstream the change or ship it as a pi extension once footer hooks are exposed.
+</p>
+
+</div>
+</body>
+</html>
