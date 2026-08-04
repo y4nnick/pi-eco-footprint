@@ -6,8 +6,10 @@ Show estimated **⚡ energy** and **💧 water** usage of each pi chat in the fo
 
 ```
 ↑12k ↓3.4k R8k $0.042              claude-sonnet-4
-⚡28.5Wh 💧  0.051L
+⚡28.5Wh (1.9📱) 💧  0.051L
 ```
+
+Energy is shown as **Wh (or kWh) plus an equivalent number of full smartphone charges** (📱, ~15 Wh each — based on a typical 4000–5000 mAh phone battery at 3.7 V). Water is shown in **litres**.
 
 ## What it does
 

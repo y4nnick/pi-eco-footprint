@@ -39,9 +39,17 @@ function classifyModel(model: { id?: string; reasoning?: boolean } | undefined):
 }
 
 function formatWh(wh: number): string {
-	if (wh < 1) return `${wh.toFixed(2)}Wh`;
-	if (wh < 1000) return `${wh.toFixed(1)}Wh`;
-	return `${(wh / 1000).toFixed(2)}kWh`;
+	// Show raw energy + smartphone-charge equivalent (1 full charge ≈ 15 Wh, ~5000 mAh @ 3.7V).
+	const charges = wh / 15;
+	let raw: string;
+	if (wh < 1) raw = `${wh.toFixed(2)}Wh`;
+	else if (wh < 1000) raw = `${wh.toFixed(1)}Wh`;
+	else raw = `${(wh / 1000).toFixed(2)}kWh`;
+	let chargesStr: string;
+	if (charges < 0.1) chargesStr = charges.toFixed(2);
+	else if (charges < 10) chargesStr = charges.toFixed(1);
+	else chargesStr = Math.round(charges).toString();
+	return `${raw} (${chargesStr}. phone charges)`;
 }
 
 function formatLiters(ml: number): string {
@@ -127,7 +135,7 @@ export default function (pi: ExtensionAPI) {
 				`Input tokens:  ${inputTokens.toLocaleString()}  (fresh ${totals.input.toLocaleString()}, cache-read ${totals.cacheRead.toLocaleString()}, cache-write ${totals.cacheWrite.toLocaleString()})`,
 				`Output tokens: ${totals.output.toLocaleString()}`,
 				``,
-				`⚡ Energy: ${formatWh(energyWh)}   (PUE ${PUE})`,
+				`⚡ Energy: ${formatWh(energyWh)}   (PUE ${PUE}; 📱 ≈ full smartphone charges @ 15 Wh)`,
 				`💧 Water:  ${formatLiters(waterMl)}   (WUE ${WUE_ML_PER_WH} mL/Wh)`,
 				``,
 				`≈ running a 10W LED bulb for ${(energyWh / 10 * 60).toFixed(1)} minutes`,
