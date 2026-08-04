@@ -47,15 +47,15 @@ Water_mL = E_total_Wh * WUE  (WUE = 1.8 mL/Wh = 1.8 L/kWh)
 ```
 
 - **PUE** (Power Usage Effectiveness) and **WUE** (Water Usage Effectiveness) are the standard data-center efficiency metrics defined by The Green Grid.
-  - PUE — [The Green Grid, *PUE: A Comprehensive Examination of the Metric* (2012)](https://www.thegreengrid.org/en/resources/library-and-tools/237-Usage-Effectiveness%E2%84%A2-%28PUE%E2%84%A2%29%3A-A-Comprehensive-Examination-of-the-Metric)
-  - WUE — [The Green Grid, *Water Usage Effectiveness (WUE): A Green Grid Data Center Sustainability Metric* (2011)](https://www.thegreengrid.org/en/resources/library-and-tools/238-Water-Usage-Effectiveness-(WUE%E2%84%A2)%3A-A-Green-Grid-Data-Center-Sustainability-Metric)
+  - PUE — [Wikipedia: Power usage effectiveness](https://en.wikipedia.org/wiki/Power_usage_effectiveness) (summarises The Green Grid's original *PUE: A Comprehensive Examination of the Metric*, 2012)
+  - WUE — [Wikipedia: Water usage effectiveness](https://en.wikipedia.org/wiki/Water_usage_effectiveness) (summarises The Green Grid's original *WUE: A Green Grid Data Center Sustainability Metric*, 2011)
 
 ### Constants and their sources
 
 | Constant | Value | Source |
 |---|---|---|
-| PUE (hyperscaler avg.) | **1.15** | [Google 2024 Environmental Report](https://sustainability.google/reports/google-2024-environmental-report/) reports a fleet-wide PUE of 1.10; [Meta 2023 Sustainability Report](https://sustainability.atmeta.com/2024-sustainability-report/) reports 1.08–1.12; [AWS sustainability disclosures](https://sustainability.aboutamazon.com/climate-solutions/data-centers) sit around 1.15–1.2. We use 1.15 as a conservative hyperscale average. |
-| WUE | **1.8 L/kWh** | [Shehabi et al., *2024 United States Data Center Energy Usage Report* (LBNL)](https://eta-publications.lbl.gov/publications/2024-united-states-data-center-energy) reports on-site WUE distributions; [Mytton, *Data centre water consumption*, npj Clean Water (2021)](https://www.nature.com/articles/s41545-021-00101-w) surveys reported WUE values across operators, with a common range of 1.5–2.2 L/kWh for evaporatively-cooled sites. |
+| PUE (hyperscaler avg.) | **1.15** | [Google 2024 Environmental Report](https://sustainability.google/reports/google-2024-environmental-report/) reports a fleet-wide PUE of 1.10; [Meta 2023 Sustainability Report](https://sustainability.atmeta.com/2024-sustainability-report/) reports 1.08–1.12; [AWS data centers](https://aws.amazon.com/sustainability/data-centers/) sit around 1.15–1.2. We use 1.15 as a conservative hyperscale average. |
+| WUE | **1.8 L/kWh** | [Smith, Shehabi et al., *United States Data Center Energy Usage Report: 2025 Update* (LBNL / OSTI, 2024)](https://www.osti.gov/biblio/3374245) reports on-site WUE distributions; [Mytton, *Data centre water consumption*, npj Clean Water (2021)](https://www.nature.com/articles/s41545-021-00101-w) surveys reported WUE values across operators, with a common range of 1.5–2.2 L/kWh for evaporatively-cooled sites. |
 
 ### Per-token energy by model class
 
@@ -73,7 +73,7 @@ These coefficients are triangulated from:
 - **Sam Altman, *The Gentle Singularity* (2025)** — reports an average ChatGPT query at ~0.34 Wh and ~0.32 mL of water, used as a sanity check for the frontier class. [blog.samaltman.com/the-gentle-singularity](https://blog.samaltman.com/the-gentle-singularity)
 - **De Vries, *The growing energy footprint of AI* (Joule, 2023)** — top-down estimates of AI inference energy at data-center scale. [doi.org/10.1016/j.joule.2023.09.004](https://doi.org/10.1016/j.joule.2023.09.004)
 
-The **1.5× thinking multiplier** for reasoning models accounts for hidden chain-of-thought tokens that aren't billed but still consume compute. See the [OpenAI o1 system card](https://openai.com/index/openai-o1-system-card/) and [DeepSeek-R1 technical report](https://arxiv.org/abs/2501.12948) for descriptions of the extended internal-reasoning phase.
+The **1.5× thinking multiplier** for reasoning models accounts for hidden chain-of-thought tokens that aren't billed but still consume compute. See the [OpenAI o1 System Card (PDF)](https://cdn.openai.com/o1-system-card-20240917.pdf) and [DeepSeek-R1 technical report](https://arxiv.org/abs/2501.12948) for descriptions of the extended internal-reasoning phase.
 
 ### Classification
 
