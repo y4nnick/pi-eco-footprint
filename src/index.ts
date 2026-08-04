@@ -49,7 +49,7 @@ function formatWh(wh: number): string {
 	if (charges < 0.1) chargesStr = charges.toFixed(2);
 	else if (charges < 10) chargesStr = charges.toFixed(1);
 	else chargesStr = Math.round(charges).toString();
-	return `${raw} (${chargesStr}. phone charges)`;
+	return `${raw} (${chargesStr} 📱)`;
 }
 
 function formatLiters(ml: number): string {
@@ -106,8 +106,19 @@ function updateStatus(ctx: ExtensionContext): void {
 
 export default function (pi: ExtensionAPI) {
 	// Refresh on session start / resume / fork / reload
-	pi.on("session_start", async (_event, ctx) => {
+	pi.on("session_start", async (event, ctx) => {
 		updateStatus(ctx);
+		// Show a friendly intro on brand-new chats + first startup, but not on
+		// reload/resume/fork where the user already knows what the icons mean.
+		if (!ctx.hasUI) return;
+		const reason = (event as { reason?: string }).reason;
+		if (reason === "new" || reason === "startup") {
+			ctx.ui.notify(
+				"🌱 eco-footprint active — the footer shows this chat's estimated energy (⚡ Wh) and water (💧 L). " +
+					"The 📱 number is how many full smartphone charges (~15 Wh each) that energy is equivalent to. Type /eco for a detailed breakdown.",
+				"info",
+			);
+		}
 	});
 
 	// Refresh when a new assistant message finishes (new usage numbers)
