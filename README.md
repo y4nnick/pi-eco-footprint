@@ -2,8 +2,6 @@
 
 Show estimated **⚡ energy** and **💧 water** usage of each pi chat in the footer, based on the active model class and cumulative token counts.
 
-![footer example](./docs/screenshot.png)
-
 ```
 ↑12k ↓3.4k R8k $0.042              claude-sonnet-4
 ⚡28.5Wh (1.9📱) 💧 0.051L
